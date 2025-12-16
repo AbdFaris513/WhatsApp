@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:whatsapp/controllers/app_startup_controller.dart';
 import 'package:whatsapp/utils/my_colors.dart';
 import 'package:whatsapp/widgets/from_facebook.dart';
 
@@ -12,11 +14,11 @@ class SplashScreen extends StatefulWidget with MyColors {
 }
 
 class _SplashScreenState extends State<SplashScreen> {
-  // final FirstController firstController = Get.put(FirstController());
+  final AppStartupController _appStartupController = Get.put(AppStartupController());
   @override
   void initState() {
     super.initState();
-    // firstController.checkLoginStatus(mounted, context);
+    _appStartupController.checkLoginStatus(mounted, context);
   }
 
   @override
