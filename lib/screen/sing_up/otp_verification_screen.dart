@@ -1,10 +1,7 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:whatsapp/screen/chats/chat_body.dart';
 import 'package:whatsapp/screen/sing_up/profile_setup_screen.dart';
 import 'package:whatsapp/utils/my_colors.dart';
 
@@ -58,30 +55,29 @@ class OtpVerificationScreen extends StatelessWidget with MyColors {
     }
 
     if (rawInput == verificationId) {
-      final CollectionReference users = FirebaseFirestore.instance.collection('users');
+      // final CollectionReference users = FirebaseFirestore.instance.collection('users');
 
-      final doc = await users.doc(phoneNumber).get();
+      // final doc = await users.doc(phoneNumber).get();
 
-      if (!doc.exists) {
-        Navigator.pushReplacement(
-          // ignore: use_build_context_synchronously
-          context,
-          MaterialPageRoute(builder: (context) => ProfileSetupScreen(phoneNumber: phoneNumber)),
-        );
-      } else {
-        debugPrint('Phone number already registered');
-        final prefs = await SharedPreferences.getInstance();
-        await prefs.setString('loggedInPhone', phoneNumber);
+      // if (!doc.exists) {
+      Navigator.pushReplacement(
+        // ignore: use_build_context_synchronously
+        context,
+        MaterialPageRoute(builder: (context) => ProfileSetupScreen(phoneNumber: phoneNumber)),
+      );
+      // } else {
+      // debugPrint('Phone number already registered');
+      // final prefs = await SharedPreferences.getInstance();
+      // await prefs.setString('loggedInPhone', phoneNumber);
 
-        // contactController.getMessagedContactsStream();
-        // await contactController.getUserContactList(phoneNumber: phoneNumber);
+      // contactController.getMessagedContactsStream();
+      // await contactController.getUserContactList(phoneNumber: phoneNumber);
 
-        Navigator.pushReplacement(
-          // ignore: use_build_context_synchronously
-          context,
-          MaterialPageRoute(builder: (context) => HomeScreen()),
-        );
-      }
+      // Navigator.pushReplacement(
+      //   context,
+      //   MaterialPageRoute(builder: (context) => HomeScreen()),
+      // );
+      // }
     }
 
     // try {
