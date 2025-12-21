@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:whatsapp/screen/chats/chat_body.dart';
+import 'package:whatsapp/screen/chats/home_screen.dart';
 import 'package:whatsapp/screen/sing_up/terms_acceptance_screen.dart';
 
 class AppStartupController extends GetxController {

@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:whatsapp/screen/chats/chat_body.dart';
+import 'package:whatsapp/screen/chats/home_screen.dart';
 import 'package:whatsapp/service/cloudinary_service.dart';
 import 'package:whatsapp/service/firestore_service.dart';
 import 'package:whatsapp/widgets/image_crop_screen.dart';
