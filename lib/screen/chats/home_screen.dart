@@ -16,6 +16,13 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   final ChatController _chatController = Get.put(ChatController());
+
+  @override
+  void initState() {
+    _chatController.getContactList();
+    super.initState();
+  }
+
   @override
   void dispose() {
     // Clean up when widget is disposed

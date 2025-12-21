@@ -35,7 +35,7 @@ class MyApp extends StatelessWidget {
           bodyMedium: TextStyle(color: Colors.white70),
         ),
       ),
-      home: const SplashScreen(), // ChatBodyScreen() //  ChatsScreen(),
+      home: const SplashScreen(),
     );
   }
 }

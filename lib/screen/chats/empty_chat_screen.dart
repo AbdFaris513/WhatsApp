@@ -78,10 +78,10 @@ class _EmptyChatScreenState extends State<EmptyChatScreen> {
                   itemBuilder: (context, index) {
                     return InkWell(
                       onTap: () async {
-                        // await firstController.getChatScreen(
-                        //   context: context,
-                        // .contactDataList: _chatController.contactDataList[index],
-                        // );
+                        await _chatController.getChatScreen(
+                          context: context,
+                          contactData: _chatController.contactDataList[index],
+                        );
                       },
                       child: Padding(
                         padding: const EdgeInsets.only(right: 10),

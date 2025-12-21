@@ -5,7 +5,9 @@ import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:whatsapp/controllers/chat_controller.dart';
+import 'package:whatsapp/controllers/user_controller.dart';
 import 'package:whatsapp/model/contact_models.dart';
+import 'package:whatsapp/screen/chats/chats_screen.dart';
 import 'package:whatsapp/screen/chats/empty_chat_screen.dart';
 import 'package:whatsapp/utils/my_colors.dart';
 import 'package:whatsapp/widgets/search.dart';
@@ -91,6 +93,7 @@ class ChatsDetailsContainer extends StatefulWidget with MyColors {
 
 class _ChatsDetailsContainerState extends State<ChatsDetailsContainer> {
   final ChatController _chatController = Get.put(ChatController());
+  final UserController _userController = Get.put(UserController());
 
   late final String? userID;
 
@@ -108,14 +111,14 @@ class _ChatsDetailsContainerState extends State<ChatsDetailsContainer> {
   Widget build(BuildContext context) {
     return InkWell(
       onTap: () async {
-        // String? currentUserId = await chatBodyController.getUserPhoneNumber();
+        String? currentUserId = await _userController.getPhoneNumber();
 
-        // Get.to(
-        //   () => ChatsScreen(
-        //     contactDetailData: widget.contactData,
-        //     currentUserId: currentUserId ?? 'null',
-        //   ),
-        // );
+        Get.to(
+          () => ChatsScreen(
+            contactDetailData: widget.contactData,
+            currentUserId: currentUserId ?? 'null',
+          ),
+        );
       },
       child: InkWell(
         onTap: () async {
