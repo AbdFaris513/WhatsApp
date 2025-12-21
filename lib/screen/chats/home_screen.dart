@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:whatsapp/controllers/chat_controller.dart';
+import 'package:whatsapp/screen/chats/chat_menus_list.dart';
 import 'package:whatsapp/screen/contact/contact_list.dart';
 import 'package:whatsapp/utils/my_colors.dart';
 
@@ -35,7 +36,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   () => Column(
                     children: [
                       if (_chatController.buttomNavigationIndex.value == 0) ...[
-                        // ChatMenusList(),
+                        ChatMenusList(),
                       ] else if (_chatController.buttomNavigationIndex.value == 1) ...[
                         Center(child: Text('Updates')),
                       ] else if (_chatController.buttomNavigationIndex.value == 2) ...[
