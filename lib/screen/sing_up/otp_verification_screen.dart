@@ -1,8 +1,12 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:whatsapp/controllers/user_controller.dart';
 import 'package:whatsapp/screen/sing_up/profile_setup_screen.dart';
+import 'package:whatsapp/screen/splash_screen.dart';
 import 'package:whatsapp/utils/my_colors.dart';
 
 class OtpVerificationScreen extends StatelessWidget with MyColors {
@@ -11,7 +15,7 @@ class OtpVerificationScreen extends StatelessWidget with MyColors {
 
   OtpVerificationScreen({super.key, required this.verificationId, required this.phoneNumber});
 
-  // final ContactController contactController = Get.put(ContactController());
+  final UserController _userController = Get.put(UserController());
 
   final TextEditingController _controller = TextEditingController(text: "- - - - - -");
 
@@ -55,29 +59,19 @@ class OtpVerificationScreen extends StatelessWidget with MyColors {
     }
 
     if (rawInput == verificationId) {
-      // final CollectionReference users = FirebaseFirestore.instance.collection('users');
-
-      // final doc = await users.doc(phoneNumber).get();
-
-      // if (!doc.exists) {
-      Navigator.pushReplacement(
-        // ignore: use_build_context_synchronously
-        context,
-        MaterialPageRoute(builder: (context) => ProfileSetupScreen(phoneNumber: phoneNumber)),
-      );
-      // } else {
-      // debugPrint('Phone number already registered');
-      // final prefs = await SharedPreferences.getInstance();
-      // await prefs.setString('loggedInPhone', phoneNumber);
-
-      // contactController.getMessagedContactsStream();
-      // await contactController.getUserContactList(phoneNumber: phoneNumber);
-
-      // Navigator.pushReplacement(
-      //   context,
-      //   MaterialPageRoute(builder: (context) => HomeScreen()),
-      // );
-      // }
+      final bool isExists = await _userController.getUserData(phoneNumber);
+      if (!isExists) {
+        Navigator.pushReplacement(
+          // ignore: use_build_context_synchronously
+          context,
+          MaterialPageRoute(builder: (context) => ProfileSetupScreen(phoneNumber: phoneNumber)),
+        );
+      } else {
+        debugPrint('Phone number already registered');
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.setString('loggedInPhone', phoneNumber);
+        Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => SplashScreen()));
+      }
     }
 
     // try {

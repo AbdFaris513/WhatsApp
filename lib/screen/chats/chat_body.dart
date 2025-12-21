@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:whatsapp/utils/my_colors.dart';
@@ -53,22 +52,20 @@ class _HomeScreenState extends State<HomeScreen> {
             Expanded(
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-                child: Obx(
-                  () => Column(
-                    children: [
-                      // if (chatBodyController.bottonNavigatorIndex.value == 0) ...[
-                      //   // ChatMenusList(),
-                      // ] else if (chatBodyController.bottonNavigatorIndex.value == 1) ...[
-                      //   Center(child: Text('Chat')),
-                      // ] else if (chatBodyController.bottonNavigatorIndex.value == 2) ...[
-                      //   Center(child: Text('Updates')),
-                      // ] else if (chatBodyController.bottonNavigatorIndex.value == 3) ...[
-                      //   // ContactListScreen(),
-                      // ] else ...[
-                      Center(child: Text('No Data')),
-                      // ],
-                    ],
-                  ),
+                child: Column(
+                  children: [
+                    // if (chatBodyController.bottonNavigatorIndex.value == 0) ...[
+                    //   // ChatMenusList(),
+                    // ] else if (chatBodyController.bottonNavigatorIndex.value == 1) ...[
+                    //   Center(child: Text('Chat')),
+                    // ] else if (chatBodyController.bottonNavigatorIndex.value == 2) ...[
+                    //   Center(child: Text('Updates')),
+                    // ] else if (chatBodyController.bottonNavigatorIndex.value == 3) ...[
+                    //   // ContactListScreen(),
+                    // ] else ...[
+                    Center(child: Text('No Data')),
+                    // ],
+                  ],
                 ),
               ),
             ),
@@ -95,50 +92,48 @@ class BottomNavigator extends StatelessWidget with MyColors {
 
   @override
   Widget build(BuildContext context) {
-    return Obx(
-      () => Row(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        children: List.generate(bottomNavigationComponent.length, (index) {
-          // bool isSelected = chatBodyController.bottonNavigatorIndex.value == index;
-          return GestureDetector(
-            onTap: () {
-              // chatBodyController.bottonNavigatorIndex.value = index;
-            },
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Container(
-                  padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                  decoration: BoxDecoration(
-                    color:
-                        true //isSelected
-                        ? MyColors.cetagorySelectedContainerBackgroundColor
-                        : Colors.transparent,
-                    borderRadius: BorderRadius.circular(30),
-                  ),
-                  child: Icon(
-                    bottomNavigationComponent[index].icon,
-                    size: 20,
-                    color:
-                        true //isSelected
-                        ? MyColors.cetagorySelectedContainerForegroundColor
-                        : Colors.white,
-                  ),
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      children: List.generate(bottomNavigationComponent.length, (index) {
+        // bool isSelected = chatBodyController.bottonNavigatorIndex.value == index;
+        return GestureDetector(
+          onTap: () {
+            // chatBodyController.bottonNavigatorIndex.value = index;
+          },
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Container(
+                padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                decoration: BoxDecoration(
+                  color:
+                      true //isSelected
+                      ? MyColors.cetagorySelectedContainerBackgroundColor
+                      : Colors.transparent,
+                  borderRadius: BorderRadius.circular(30),
                 ),
-                SizedBox(height: 4),
-                Text(
-                  bottomNavigationComponent[index].name,
-                  style: GoogleFonts.roboto(
-                    color: Colors.white,
-                    fontSize: 13,
-                    fontWeight: FontWeight.w600,
-                  ),
+                child: Icon(
+                  bottomNavigationComponent[index].icon,
+                  size: 20,
+                  color:
+                      true //isSelected
+                      ? MyColors.cetagorySelectedContainerForegroundColor
+                      : Colors.white,
                 ),
-              ],
-            ),
-          );
-        }),
-      ),
+              ),
+              SizedBox(height: 4),
+              Text(
+                bottomNavigationComponent[index].name,
+                style: GoogleFonts.roboto(
+                  color: Colors.white,
+                  fontSize: 13,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ],
+          ),
+        );
+      }),
     );
   }
 }

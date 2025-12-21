@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:whatsapp/screen/chats/chat_body.dart';
 import 'package:whatsapp/screen/sing_up/terms_acceptance_screen.dart';
 
 class AppStartupController extends GetxController {
@@ -19,8 +20,9 @@ class AppStartupController extends GetxController {
         // ignore: use_build_context_synchronously
         context,
         MaterialPageRoute(
-          builder: (context) =>
-              userExists ? TermsAcceptanceScreen() : const TermsAcceptanceScreen(),
+          // builder: (context) =>
+          // userExists ? TermsAcceptanceScreen() : const TermsAcceptanceScreen(),
+          builder: (context) => userExists ? HomeScreen() : const TermsAcceptanceScreen(),
         ),
       );
     }
