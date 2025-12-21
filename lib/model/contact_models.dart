@@ -1,9 +1,8 @@
 class ContactData {
-  final String id; // unique contact id
+  final String contactNumber; // unique contact id
   final String contactFirstName;
   final String? contactSecondName;
   final String? contactBusinessName;
-  String contactNumber;
   final String? contactStatus; // "Busy", "Available", etc.
   final String? contactImage;
   final DateTime? contactLastSeen;
@@ -22,11 +21,10 @@ class ContactData {
   final List<String>? labels; // WhatsApp Business tags
 
   ContactData({
-    required this.id,
+    required this.contactNumber,
     required this.contactFirstName,
     this.contactSecondName,
     this.contactBusinessName,
-    required this.contactNumber,
     this.contactStatus,
     this.contactImage,
     this.contactLastSeen,
@@ -44,6 +42,37 @@ class ContactData {
     this.lastInteraction,
     this.labels,
   });
+
+  factory ContactData.fromJson(Map<String, dynamic> json) {
+    return ContactData(
+      contactNumber: json['contactNumber'] ?? '',
+      contactFirstName: json['contactFirstName'] ?? '',
+      contactSecondName: json['contactSecondName'],
+      contactBusinessName: json['contactBusinessName'],
+      contactStatus: json['contactStatus'],
+      contactImage: json['contactImage'],
+      contactLastSeen: json['contactLastSeen'] != null
+          ? DateTime.parse(json['contactLastSeen'])
+          : null,
+      contactLastMsgTime: json['contactLastMsgTime'] != null
+          ? DateTime.parse(json['contactLastMsgTime'])
+          : null,
+      contactLastMsg: json['contactLastMsg'],
+      contactLastMsgType: json['contactLastMsgType'],
+      unreadMessages: json['unreadMessages'] ?? 0,
+      isContactPinned: json['isContactPinned'] ?? false,
+      isContactMuted: json['isContactMuted'] ?? false,
+      isContactBlocked: json['isContactBlocked'] ?? false,
+      isContactArchived: json['isContactArchived'] ?? false,
+      isOnline: json['isOnline'] ?? false,
+      about: json['about'],
+      lastMessageId: json['lastMessageId'],
+      lastInteraction: json['lastInteraction'] != null
+          ? DateTime.parse(json['lastInteraction'])
+          : null,
+      labels: json['labels'] != null ? List<String>.from(json['labels']) : null,
+    );
+  }
 
   // Add this to your ContactModel class
   ContactData copyWith({
@@ -70,11 +99,10 @@ class ContactData {
     List<String>? labels,
   }) {
     return ContactData(
-      id: id ?? this.id,
+      contactNumber: contactNumber ?? this.contactNumber,
       contactFirstName: contactFirstName ?? this.contactFirstName,
       contactSecondName: contactSecondName ?? this.contactSecondName,
       contactBusinessName: contactBusinessName ?? this.contactBusinessName,
-      contactNumber: contactNumber ?? this.contactNumber,
       contactStatus: contactStatus ?? this.contactStatus,
       contactImage: contactImage ?? this.contactImage,
       contactLastSeen: contactLastSeen ?? this.contactLastSeen,
@@ -92,5 +120,41 @@ class ContactData {
       lastInteraction: lastInteraction ?? this.lastInteraction,
       labels: labels ?? this.labels,
     );
+  }
+
+  factory ContactData.fromContactOnlyJson(Map<String, dynamic> json) {
+    return ContactData(
+      contactNumber: json['contactNumber'] ?? '',
+      contactFirstName: json['contactName'] ?? '',
+    );
+  }
+
+  Map<String, dynamic> toMapForContact() {
+    return {'contactNumber': contactNumber, 'contactName': contactFirstName};
+  }
+
+  Map<String, dynamic> toMap() {
+    return {
+      'contactNumber': contactNumber,
+      'contactFirstName': contactFirstName,
+      'contactSecondName': contactSecondName,
+      'contactBusinessName': contactBusinessName,
+      'contactStatus': contactStatus,
+      'contactImage': contactImage,
+      'contactLastSeen': contactLastSeen,
+      'contactLastMsgTime': contactLastMsgTime,
+      'contactLastMsg': contactLastMsg,
+      'contactLastMsgType': contactLastMsgType,
+      'unreadMessages': unreadMessages,
+      'isContactPinned': isContactPinned,
+      'isContactMuted': isContactMuted,
+      'isContactBlocked': isContactBlocked,
+      'isContactArchived': isContactArchived,
+      'isOnline': isOnline,
+      'about': about,
+      'lastMessageId': lastMessageId,
+      'lastInteraction': lastInteraction,
+      'labels': labels,
+    };
   }
 }

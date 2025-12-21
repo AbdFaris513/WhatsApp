@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:whatsapp/controllers/chat_controller.dart';
+import 'package:whatsapp/screen/contact/contact_list.dart';
 import 'package:whatsapp/utils/my_colors.dart';
 
 // ignore: must_be_immutable
@@ -15,28 +15,6 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   final ChatController _chatController = Get.put(ChatController());
-  String? phoneNumber;
-
-  Future<void> getPhoneNumber() async {
-    final prefs = await SharedPreferences.getInstance();
-    phoneNumber = prefs.getString('loggedInPhone');
-
-    if (phoneNumber != null && phoneNumber!.isNotEmpty) {
-      debugPrint('Logged-in phone number: $phoneNumber');
-      // Call both functions after getting the phone number
-      // await contactController.getUserContactList(phoneNumber: phoneNumber!);
-      // await contactController.setupMessagedContactsStream(); // ← ADD THIS LINE
-    } else {
-      debugPrint('No phone number saved.');
-    }
-  }
-
-  @override
-  initState() {
-    super.initState();
-    getPhoneNumber();
-  }
-
   @override
   void dispose() {
     // Clean up when widget is disposed
@@ -59,11 +37,11 @@ class _HomeScreenState extends State<HomeScreen> {
                       if (_chatController.buttomNavigationIndex.value == 0) ...[
                         // ChatMenusList(),
                       ] else if (_chatController.buttomNavigationIndex.value == 1) ...[
-                        Center(child: Text('Chat')),
-                      ] else if (_chatController.buttomNavigationIndex.value == 2) ...[
                         Center(child: Text('Updates')),
+                      ] else if (_chatController.buttomNavigationIndex.value == 2) ...[
+                        Center(child: Text('Communities')),
                       ] else if (_chatController.buttomNavigationIndex.value == 3) ...[
-                        // ContactListScreen(),
+                        ContactListScreen(),
                       ] else ...[
                         Center(child: Text('No Data')),
                       ],

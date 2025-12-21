@@ -1,4 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/material.dart';
+import 'package:whatsapp/model/contact_models.dart';
 
 class FirebaseHelper {
   static final FirebaseFirestore _firestore = FirebaseFirestore.instance;
@@ -10,9 +12,9 @@ class FirebaseHelper {
     required String profilePictureUrl,
   }) async {
     try {
-      print('Creating user in Firestore...');
-      print('Phone: $phone');
-      print('Name: $name');
+      debugPrint('Creating user in Firestore...');
+      debugPrint('Phone: $phone');
+      debugPrint('Name: $name');
 
       await _firestore.collection('users').doc(phone).set({
         'name': name,
@@ -25,30 +27,58 @@ class FirebaseHelper {
         'contactList': [],
       });
 
-      print('User created successfully in Firestore');
+      debugPrint('User created successfully in Firestore');
     } catch (e) {
-      print('Error creating user in Firestore: $e');
-      print('Error details: ${e.toString()}');
+      debugPrint('Error creating user in Firestore: $e');
+      debugPrint('Error details: ${e.toString()}');
       rethrow;
     }
   }
 
-  // Add a contact to user's contact list
-  static Future<void> addContactToUser({
+  static Future<bool> doesUserExistByPhone(String phoneNumber) async {
+    final DocumentSnapshot userDoc = await _firestore.collection('users').doc(phoneNumber).get();
+
+    return userDoc.exists;
+  }
+
+  static Future<void> upsertContact({
     required String userPhone,
-    required String contactName,
-    required String contactPhone,
+    required ContactData contact,
   }) async {
+    final docRef = _firestore.collection('users').doc(userPhone);
+    final docSnap = await docRef.get();
+
+    if (!docSnap.exists) return;
+
+    final List<Map<String, dynamic>> contactList = List<Map<String, dynamic>>.from(
+      docSnap.data()?['contactList'] ?? [],
+    );
+
+    final int existingIndex = contactList.indexWhere(
+      (c) => c['contactNumber'] == contact.contactNumber,
+    );
+
+    if (existingIndex != -1) {
+      // 🔁 Update existing contact name
+      contactList[existingIndex]['contactName'] = contact.contactFirstName;
+    } else {
+      // ➕ Add new contact
+      contactList.add(contact.toMapForContact());
+    }
+
+    await docRef.update({'contactList': contactList});
+  }
+
+  static Future<List<Map<String, dynamic>>> getContactList(String userNumber) async {
     try {
-      await _firestore.collection('users').doc(userPhone).update({
-        'contactList': FieldValue.arrayUnion([
-          {'contactName': contactName, 'phoneNumber': contactPhone},
-        ]),
-      });
-      print('Contact added successfully');
+      final docSnap = await _firestore.collection('users').doc(userNumber).get();
+      final List<Map<String, dynamic>> contactList = List<Map<String, dynamic>>.from(
+        docSnap.data()?['contactList'] ?? [],
+      );
+      return contactList;
     } catch (e) {
-      print('Error adding contact: $e');
-      rethrow;
+      debugPrint("Error on getContactList() : $e");
+      return [];
     }
   }
 
@@ -56,9 +86,9 @@ class FirebaseHelper {
   static Future<void> updateUserAbout({required String userPhone, required String about}) async {
     try {
       await _firestore.collection('users').doc(userPhone).update({'about': about});
-      print('About updated successfully');
+      debugPrint('About updated successfully');
     } catch (e) {
-      print('Error updating about: $e');
+      debugPrint('Error updating about: $e');
       rethrow;
     }
   }
@@ -76,9 +106,9 @@ class FirebaseHelper {
       }
 
       await _firestore.collection('users').doc(userPhone).update(updateData);
-      print('Online status updated');
+      debugPrint('Online status updated');
     } catch (e) {
-      print('Error updating online status: $e');
+      debugPrint('Error updating online status: $e');
       rethrow;
     }
   }
@@ -93,7 +123,7 @@ class FirebaseHelper {
       }
       return null;
     } catch (e) {
-      print('Error getting user data: $e');
+      debugPrint('Error getting user data: $e');
       rethrow;
     }
   }
@@ -107,9 +137,9 @@ class FirebaseHelper {
       await _firestore.collection('users').doc(userPhone).update({
         'profilePicture': profilePictureUrl,
       });
-      print('Profile picture updated successfully');
+      debugPrint('Profile picture updated successfully');
     } catch (e) {
-      print('Error updating profile picture: $e');
+      debugPrint('Error updating profile picture: $e');
       rethrow;
     }
   }
@@ -128,10 +158,10 @@ class FirebaseHelper {
         contactList.removeWhere((contact) => contact['phoneNumber'] == contactPhone);
 
         await _firestore.collection('users').doc(userPhone).update({'contactList': contactList});
-        print('Contact removed successfully');
+        debugPrint('Contact removed successfully');
       }
     } catch (e) {
-      print('Error removing contact: $e');
+      debugPrint('Error removing contact: $e');
       rethrow;
     }
   }
@@ -148,7 +178,7 @@ class FirebaseHelper {
       }
       return [];
     } catch (e) {
-      print('Error getting user contacts: $e');
+      debugPrint('Error getting user contacts: $e');
       rethrow;
     }
   }

@@ -37,12 +37,12 @@ class ContactListScreen extends StatelessWidget {
               children: [
                 Obx(
                   () => ListView.builder(
-                    itemCount: _chatController.contactData.length,
+                    itemCount: _chatController.contactDataList.length,
                     itemBuilder: (context, index) {
                       return Padding(
                         padding: const EdgeInsets.only(bottom: 12),
                         child: ContactDetailsContainer(
-                          contactData: _chatController.contactData[index],
+                          contactData: _chatController.contactDataList[index],
                         ),
                       );
                     },

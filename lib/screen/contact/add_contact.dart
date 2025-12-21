@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:whatsapp/controllers/chat_controller.dart';
 import 'package:whatsapp/model/contact_models.dart';
@@ -157,6 +158,9 @@ class _ContactPopupState extends State<ContactPopup> with MyColors {
                           labelText: 'Phone',
                           errorText: phoneNumberError,
                         ),
+                        inputFormatters: [
+                          FilteringTextInputFormatter.digitsOnly, // 👈 only numbers
+                        ],
                       ),
                     ),
                   ],
@@ -202,7 +206,6 @@ class _ContactPopupState extends State<ContactPopup> with MyColors {
 
                 _chatController.addContact(
                   ContactData(
-                    id: DateTime.now().millisecondsSinceEpoch.toString(),
                     contactFirstName: _firstNameController.text.trim(),
                     contactSecondName: _secoundNameController.text.trim(),
                     contactBusinessName: _businessNameController.text.trim(),
