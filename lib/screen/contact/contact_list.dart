@@ -103,13 +103,9 @@ class ContactDetailsContainer extends StatelessWidget with MyColors {
               children: [
                 ClipRRect(
                   borderRadius: BorderRadiusGeometry.circular(50),
-                  child: Image.asset(
-                    contactData.contactImage == null
-                        ? "assets/no_dp.jpeg"
-                        : contactData.contactImage!,
-                    height: 45,
-                    width: 45,
-                  ),
+                  child: contactData.contactImage != null
+                      ? Image.network(contactData.contactImage!, height: 45, width: 45)
+                      : Image.asset("assets/no_dp.jpeg", height: 45, width: 45),
                 ),
                 SizedBox(width: 6),
                 Column(

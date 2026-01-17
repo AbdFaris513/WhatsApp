@@ -1,3 +1,5 @@
+// ChatsScreen - FIXED with proper reactive updates
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -7,7 +9,6 @@ import 'package:whatsapp/model/message_model.dart';
 import 'package:whatsapp/utils/my_colors.dart';
 import 'package:whatsapp/widgets/chat_style.dart';
 
-// ignore: must_be_immutable
 class ChatsScreen extends StatefulWidget {
   String currentUserId;
   ContactData contactDetailData;
@@ -18,24 +19,37 @@ class ChatsScreen extends StatefulWidget {
 }
 
 class _ChatsScreenState extends State<ChatsScreen> {
-  final ChatController _chatController = Get.put(ChatController());
   final ScrollController _scrollController = ScrollController();
+  final ChatController chatController = Get.find<ChatController>();
 
   @override
   void initState() {
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _scrollController.animateTo(
-        _scrollController.position.maxScrollExtent,
-        duration: const Duration(milliseconds: 300),
-        curve: Curves.easeOut,
-      );
-    });
     super.initState();
+
+    // ✅ Scroll to bottom whenever messages list changes
+    ever(chatController.messagesList, (_) {
+      WidgetsBinding.instance.addPostFrameCallback((__) {
+        if (_scrollController.hasClients && _scrollController.position.maxScrollExtent > 0) {
+          _scrollController.animateTo(
+            _scrollController.position.maxScrollExtent,
+            duration: const Duration(milliseconds: 300),
+            curve: Curves.easeOut,
+          );
+        }
+      });
+    });
+
+    // ✅ Initial scroll after first build
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (_scrollController.hasClients && _scrollController.position.maxScrollExtent > 0) {
+        _scrollController.jumpTo(_scrollController.position.maxScrollExtent);
+      }
+    });
   }
 
   @override
   void dispose() {
-    _scrollController.dispose(); // Dispose the scroll controller
+    _scrollController.dispose();
     super.dispose();
   }
 
@@ -43,7 +57,6 @@ class _ChatsScreenState extends State<ChatsScreen> {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
-        // backgroundColor: MyColors.cetagorySelectedContainerBackgroundColor,
         body: Column(
           children: [
             Expanded(
@@ -54,27 +67,37 @@ class _ChatsScreenState extends State<ChatsScreen> {
                     currentUserId: widget.currentUserId,
                   ),
                   Expanded(
-                    child: Obx(
-                      () => Container(
+                    child: Obx(() {
+                      debugPrint(
+                        "🔄 Building ListView with ${chatController.messagesList.length} messages",
+                      );
+
+                      if (chatController.messagesList.isEmpty) {
+                        return Center(
+                          child: Text(
+                            "No messages yet",
+                            style: GoogleFonts.roboto(
+                              color: MyColors.massageFieldForeGroundColor,
+                              fontSize: 16,
+                            ),
+                          ),
+                        );
+                      }
+
+                      return Container(
                         margin: EdgeInsets.only(top: 4),
                         child: ListView.builder(
                           controller: _scrollController,
-                          itemCount: _chatController.messagesList.length,
+                          itemCount: chatController.messagesList.length,
                           itemBuilder: (context, index) {
-                            return Column(
-                              children: [
-                                ChatStyle(
-                                  messageDatas: _chatController.messagesList[index],
-                                  isSender:
-                                      _chatController.messagesList[index].msgSender !=
-                                      (widget.contactDetailData.contactNumber), // just for demo
-                                ),
-                              ],
-                            );
+                            final message = chatController.messagesList[index];
+                            final isSender = message.msgSender == widget.currentUserId;
+
+                            return ChatStyle(messageDatas: message, isSender: isSender);
                           },
                         ),
-                      ),
-                    ),
+                      );
+                    }),
                   ),
                 ],
               ),
@@ -92,17 +115,16 @@ class _ChatsScreenState extends State<ChatsScreen> {
 }
 
 // Footer
-// ignore: must_be_immutable
 class ChatsScreenFooter extends StatefulWidget with MyColors {
   String currentUserId;
   ContactData contactDetailData;
-  ScrollController scrollController; // Add this
+  ScrollController scrollController;
 
   ChatsScreenFooter({
     super.key,
     required this.contactDetailData,
     required this.currentUserId,
-    required this.scrollController, // Add this parameter
+    required this.scrollController,
   });
 
   @override
@@ -110,7 +132,7 @@ class ChatsScreenFooter extends StatefulWidget with MyColors {
 }
 
 class _ChatsScreenFooterState extends State<ChatsScreenFooter> with MyColors {
-  final ChatController _chatController = Get.put(ChatController());
+  final ChatController chatController = Get.find<ChatController>();
   final TextEditingController _messageController = TextEditingController();
 
   @override
@@ -119,38 +141,27 @@ class _ChatsScreenFooterState extends State<ChatsScreenFooter> with MyColors {
     super.dispose();
   }
 
-  void _handleSendMessage() {
+  void _handleSendMessage() async {
     final text = _messageController.text.trim();
-    if (text.isNotEmpty) {
-      debugPrint("Send: $text : ${widget.currentUserId}");
-      final MessageModel messages = MessageModel(
-        id: '',
-        msg: text,
-        msgSender: widget.currentUserId,
-        msgReceiver: widget.contactDetailData.contactNumber,
-        type: MessageType.text,
-        status: MessageStatus.sending,
-        sendTime: DateTime.now(),
-      );
-
-      // chatScreenController.sendMessage(msg: messages);
-
-      setState(() {
-        // chatScreenController.messages.add(messages);
-      });
-      _messageController.clear();
-
-      // ✅ scroll to bottom after rebuild
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        widget.scrollController.animateTo(
-          widget.scrollController.position.maxScrollExtent,
-          duration: const Duration(milliseconds: 300),
-          curve: Curves.easeOut,
-        );
-      });
-    } else {
-      debugPrint("Mic pressed");
+    if (text.isEmpty) {
+      debugPrint("🎤 Mic pressed");
+      return;
     }
+
+    debugPrint("📤 Sending message: $text");
+
+    final MessageModel message = MessageModel(
+      id: '',
+      msg: text,
+      msgSender: widget.currentUserId,
+      msgReceiver: widget.contactDetailData.contactNumber,
+      type: MessageType.text,
+      status: MessageStatus.sending,
+      sendTime: DateTime.now(),
+    );
+
+    _messageController.clear();
+    await chatController.sendMessage(msg: message);
   }
 
   @override
@@ -173,8 +184,6 @@ class _ChatsScreenFooterState extends State<ChatsScreenFooter> with MyColors {
                   size: 26,
                 ),
                 const SizedBox(width: 8),
-
-                // ✅ Text field
                 Expanded(
                   child: TextField(
                     controller: _messageController,
@@ -193,11 +202,10 @@ class _ChatsScreenFooterState extends State<ChatsScreenFooter> with MyColors {
                       isDense: true,
                       contentPadding: const EdgeInsets.symmetric(vertical: 10),
                     ),
-                    textInputAction: TextInputAction.send, // ✅ enter = send
-                    onSubmitted: (_) => _handleSendMessage(), // ✅ send on enter
+                    textInputAction: TextInputAction.send,
+                    onSubmitted: (_) => _handleSendMessage(),
                   ),
                 ),
-
                 Icon(
                   Icons.attach_file_sharp,
                   color: MyColors.massageFieldForeGroundColor,
@@ -220,8 +228,6 @@ class _ChatsScreenFooterState extends State<ChatsScreenFooter> with MyColors {
             ),
           ),
         ),
-
-        // ✅ Mic / Send button
         InkWell(
           onTap: _handleSendMessage,
           child: Container(
@@ -248,7 +254,6 @@ class _ChatsScreenFooterState extends State<ChatsScreenFooter> with MyColors {
 }
 
 // Header
-// ignore: must_be_immutable
 class ChatsScreenHeader extends StatelessWidget with MyColors {
   String currentUserId;
   ContactData contactDetailData;
@@ -257,8 +262,8 @@ class ChatsScreenHeader extends StatelessWidget with MyColors {
   @override
   Widget build(BuildContext context) {
     return Material(
-      elevation: 10, // <-- shadow depth
-      shadowColor: MyColors.backgroundColor, // optional: customize shadow
+      elevation: 10,
+      shadowColor: MyColors.backgroundColor,
       child: Container(
         color: MyColors.backgroundColor,
         padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
@@ -274,8 +279,14 @@ class ChatsScreenHeader extends StatelessWidget with MyColors {
                   child: Icon(Icons.arrow_back_rounded, color: MyColors.foregroundColor, size: 26),
                 ),
                 ClipRRect(
-                  borderRadius: BorderRadiusGeometry.circular(50),
-                  child: Image.asset("assets/no_dp.jpeg", width: 37, height: 37),
+                  borderRadius: BorderRadius.circular(50),
+                  child: contactDetailData.contactImage.toString().isNotEmpty
+                      ? Image.network(
+                          contactDetailData.contactImage.toString(),
+                          width: 37,
+                          height: 37,
+                        )
+                      : Image.asset("assets/no_dp.jpeg", width: 37, height: 37),
                 ),
                 SizedBox(width: 8),
                 Text(
@@ -292,14 +303,8 @@ class ChatsScreenHeader extends StatelessWidget with MyColors {
               children: [
                 Padding(
                   padding: const EdgeInsets.only(right: 4),
-                  child: Icon(
-                    Icons.videocam_outlined,
-                    color: MyColors.foregroundColor,
-                    size: 30,
-                    weight: 0.5,
-                  ),
+                  child: Icon(Icons.videocam_outlined, color: MyColors.foregroundColor, size: 30),
                 ),
-
                 Icon(Icons.call_outlined, color: MyColors.foregroundColor, size: 25),
                 Icon(Icons.more_vert, color: MyColors.foregroundColor, size: 28),
               ],

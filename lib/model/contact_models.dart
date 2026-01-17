@@ -126,6 +126,7 @@ class ContactData {
     return ContactData(
       contactNumber: json['contactNumber'] ?? '',
       contactFirstName: json['contactName'] ?? '',
+      contactImage: json['contactImage'],
     );
   }
 

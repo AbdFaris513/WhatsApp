@@ -91,7 +91,17 @@ class _EmptyChatScreenState extends State<EmptyChatScreen> {
                             children: [
                               ClipRRect(
                                 borderRadius: BorderRadius.circular(50),
-                                child: Image.asset("assets/no_dp.jpeg", height: 60, width: 60),
+                                child:
+                                    _chatController.contactDataList[index].contactImage
+                                        .toString()
+                                        .isNotEmpty
+                                    ? Image.network(
+                                        _chatController.contactDataList[index].contactImage
+                                            .toString(),
+                                        height: 60,
+                                        width: 60,
+                                      )
+                                    : Image.asset("assets/no_dp.jpeg", height: 60, width: 60),
                               ),
                               const SizedBox(height: 6),
                               Text(

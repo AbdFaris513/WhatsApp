@@ -155,10 +155,10 @@ class ProfileSetupController extends GetxController {
 
       Get.offAll(() => HomeScreen());
 
-      print('Profile setup completed successfully!');
-      print('Name: ${nameController.text}');
-      print('Phone: $phoneNumber');
-      print('Profile Picture URL: $profilePictureUrl');
+      debugPrint('Profile setup completed successfully!');
+      debugPrint('Name: ${nameController.text}');
+      debugPrint('Phone: $phoneNumber');
+      debugPrint('Profile Picture URL: $profilePictureUrl');
     } catch (e) {
       isUploading.value = false;
 

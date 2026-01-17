@@ -49,30 +49,30 @@ class OtpVerificationScreen extends StatelessWidget with MyColors {
   }
 
   void _verifyOtp(BuildContext context) async {
-    String rawInput = _controller.text.replaceAll(RegExp(r'[^0-9]'), '');
+    // String rawInput = _controller.text.replaceAll(RegExp(r'[^0-9]'), '');
 
-    if (rawInput.length != 6) {
-      ScaffoldMessenger.of(
+    // if (rawInput.length != 6) {
+    //   ScaffoldMessenger.of(
+    //     context,
+    //   ).showSnackBar(const SnackBar(content: Text("Please enter a 6-digit OTP")));
+    //   return;
+    // }
+
+    // if (rawInput == verificationId) {
+    final bool isExists = await _userController.getUserData(phoneNumber);
+    if (!isExists) {
+      Navigator.pushReplacement(
+        // ignore: use_build_context_synchronously
         context,
-      ).showSnackBar(const SnackBar(content: Text("Please enter a 6-digit OTP")));
-      return;
+        MaterialPageRoute(builder: (context) => ProfileSetupScreen(phoneNumber: phoneNumber)),
+      );
+    } else {
+      debugPrint('Phone number already registered');
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString('loggedInPhone', phoneNumber);
+      Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => SplashScreen()));
     }
-
-    if (rawInput == verificationId) {
-      final bool isExists = await _userController.getUserData(phoneNumber);
-      if (!isExists) {
-        Navigator.pushReplacement(
-          // ignore: use_build_context_synchronously
-          context,
-          MaterialPageRoute(builder: (context) => ProfileSetupScreen(phoneNumber: phoneNumber)),
-        );
-      } else {
-        debugPrint('Phone number already registered');
-        final prefs = await SharedPreferences.getInstance();
-        await prefs.setString('loggedInPhone', phoneNumber);
-        Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => SplashScreen()));
-      }
-    }
+    // }
 
     // try {
     //   PhoneAuthCredential credential = PhoneAuthProvider.credential(

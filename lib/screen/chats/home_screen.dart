@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:whatsapp/controllers/app_startup_controller.dart';
 import 'package:whatsapp/controllers/chat_controller.dart';
 import 'package:whatsapp/screen/chats/chat_menus_list.dart';
 import 'package:whatsapp/screen/contact/contact_list.dart';
@@ -71,6 +72,7 @@ class BottomNavigator extends StatelessWidget with MyColors {
   BottomNavigator({super.key});
 
   final ChatController _chatController = Get.put(ChatController());
+  final AppStartupController _appStartupController = Get.put(AppStartupController());
 
   final List<BottomNavigationComponent> bottomNavigationComponent = [
     BottomNavigationComponent(icon: Icons.message_outlined, name: 'Chats'),
@@ -89,6 +91,9 @@ class BottomNavigator extends StatelessWidget with MyColors {
           return GestureDetector(
             onTap: () {
               _chatController.buttomNavigationIndex.value = index;
+              if (index == 2) {
+                _appStartupController.logOut(context);
+              }
             },
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,

@@ -112,13 +112,13 @@ class _ChatsDetailsContainerState extends State<ChatsDetailsContainer> {
     return InkWell(
       onTap: () async {
         String? currentUserId = await _userController.getPhoneNumber();
-
-        Get.to(
-          () => ChatsScreen(
+        // _chatController.listenToMessages(currentUserId!, widget.contactData.contactNumber);
+        Get.to(() {
+          return ChatsScreen(
             contactDetailData: widget.contactData,
             currentUserId: currentUserId ?? 'null',
-          ),
-        );
+          );
+        });
       },
       child: InkWell(
         onTap: () async {

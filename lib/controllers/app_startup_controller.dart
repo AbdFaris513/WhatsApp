@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:whatsapp/screen/chats/home_screen.dart';
 import 'package:whatsapp/screen/sing_up/terms_acceptance_screen.dart';
+import 'package:whatsapp/screen/splash_screen.dart';
 
 class AppStartupController extends GetxController {
   void checkLoginStatus(final bool mounted, final BuildContext context) async {
@@ -26,5 +27,19 @@ class AppStartupController extends GetxController {
         ),
       );
     }
+  }
+
+  void logOut(BuildContext context) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove('loggedInPhone');
+    Navigator.pushReplacement(
+      // ignore: use_build_context_synchronously
+      context,
+      MaterialPageRoute(
+        // builder: (context) =>
+        // userExists ? TermsAcceptanceScreen() : const TermsAcceptanceScreen(),
+        builder: (context) => SplashScreen(),
+      ),
+    );
   }
 }

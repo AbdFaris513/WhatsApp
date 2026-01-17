@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
@@ -13,21 +15,16 @@ class ChatController extends GetxController {
   RxInt buttomNavigationIndex = (0).obs;
 
   RxList<MessageModel> messagesList = <MessageModel>[].obs;
+  StreamSubscription? _messagesSubscription;
+
   RxList<ContactData> contactDataList = <ContactData>[].obs;
-  RxList<ContactData> messagedContacts = <ContactData>[
-    // ContactData(
-    //   contactNumber: '9876543210',
-    //   contactFirstName: 'Arjun',
-    //   contactSecondName: 'Kumar',
-    //   contactStatus: 'Available',
-    //   isOnline: true,
-    //   unreadMessages: 3,
-    //   contactLastMsg: 'Hey, are you coming?',
-    //   contactLastMsgType: 'text',
-    //   contactLastMsgTime: DateTime.now().subtract(const Duration(minutes: 5)),
-    //   lastInteraction: DateTime.now().subtract(const Duration(minutes: 5)),
-    // ),
-  ].obs;
+  RxList<ContactData> messagedContacts = <ContactData>[].obs;
+
+  @override
+  void onClose() {
+    _messagesSubscription?.cancel();
+    super.onClose();
+  }
 
   Future<bool> doesUserExistByPhone(String phoneNumber, BuildContext context) async {
     bool isExistes = await FirebaseHelper.doesUserExistByPhone(phoneNumber);
@@ -45,7 +42,7 @@ class ChatController extends GetxController {
 
   void addContact(ContactData contactData, BuildContext context) async {
     String userPhone = await _userController.getPhoneNumber() ?? "Error";
-    bool isExistes = await doesUserExistByPhone(userPhone, context);
+    bool isExistes = await doesUserExistByPhone(contactData.contactNumber, context);
     if (!isExistes) return;
     await FirebaseHelper.upsertContact(contact: contactData, userPhone: userPhone);
     getContactList();
@@ -56,7 +53,10 @@ class ChatController extends GetxController {
     required final ContactData contactData,
   }) async {
     String? currentUserId = await _userController.getPhoneNumber() ?? "Error";
-    // await chatScreenController.listenToMessages(currentUserId ?? 'null', contactData.contactNumber);
+
+    // ✅ CRITICAL: Start listening BEFORE navigation
+    await listenToMessages(currentUserId, contactData.contactNumber);
+
     Get.to(() => ChatsScreen(contactDetailData: contactData, currentUserId: currentUserId));
   }
 
@@ -70,13 +70,37 @@ class ChatController extends GetxController {
     final dateToCheck = DateTime(dateTime.year, dateTime.month, dateTime.day);
 
     if (dateToCheck == today) {
-      // same day → show time like 10:22 pm
       return DateFormat("h:mm a").format(dateTime).toLowerCase();
     } else if (dateToCheck == yesterday) {
       return "Yesterday";
     } else {
-      // show full date like 18/08/2025
       return DateFormat("dd/MM/yyyy").format(dateTime);
+    }
+  }
+
+  // ✅ ADDED: Listen to messages stream
+  Future<void> listenToMessages(String user1, String user2) async {
+    // Cancel any existing subscription
+    _messagesSubscription?.cancel();
+
+    // Subscribe to the stream
+    _messagesSubscription = FirebaseHelper.listenToMessages(user1, user2).listen(
+      (messages) {
+        messagesList.assignAll(messages);
+        debugPrint("✅ Messages updated: ${messages.length} messages");
+      },
+      onError: (error) {
+        debugPrint("❌ Error in message stream: $error");
+      },
+    );
+  }
+
+  Future<void> sendMessage({required MessageModel msg}) async {
+    try {
+      await FirebaseHelper.sendMessage(msg: msg);
+      debugPrint("✅ Message sent successfully");
+    } catch (e) {
+      debugPrint("❌ Error on sendMessage() : $e");
     }
   }
 }
